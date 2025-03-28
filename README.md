@@ -22,8 +22,8 @@ This project is a frontend authentication system built with React, TypeScript, a
 1. **Clone the repository** (if you haven't already):
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/Shawon-bsws/my-auth-app.git
+cd my-app
 ```
 
 2. **Install dependencies**:
