@@ -18,9 +18,11 @@ describe("LoginForm", () => {
   it("renders the form with email and password fields", () => {
     render(<LoginForm {...defaultProps} />);
 
+    const submitButton = screen.getByRole("button", { name: "Log In" });
+
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Log In" })).toBeInTheDocument();
+    expect(submitButton).toBeInTheDocument();
   });
 
   it("shows validation errors when fields are empty", async () => {
@@ -34,20 +36,20 @@ describe("LoginForm", () => {
     });
   });
 
-  //   it("shows error for invalid email format", async () => {
-  //     render(<LoginForm {...defaultProps} />);
+  it("shows error for invalid email format", async () => {
+    render(<LoginForm {...defaultProps} />);
 
-  //     fireEvent.input(screen.getByLabelText("Email"), {
-  //       target: { value: "invalid-email" },
-  //     });
-  //     fireEvent.submit(screen.getByRole("button", { name: "Log In" }));
+    fireEvent.input(screen.getByLabelText("Email"), {
+      target: { value: "invalid-email" },
+    });
+    fireEvent.submit(screen.getByRole("button", { name: "Log In" }));
 
-  //     await waitFor(() => {
-  //       expect(
-  //         screen.getByText(/email must be a valid email/i)
-  //       ).toBeInTheDocument();
-  //     });
-  //   });
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Please enter a valid email address/i)
+      ).toBeInTheDocument();
+    });
+  });
 
   it("submits the form with valid data", async () => {
     render(<LoginForm {...defaultProps} />);
@@ -74,10 +76,10 @@ describe("LoginForm", () => {
   it("shows loading state when submitting", () => {
     render(<LoginForm {...defaultProps} loading={true} />);
 
-    expect(
-      screen.getByRole("button", { name: "Logging in..." })
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button")).toBeDisabled();
+    const submitButton = screen.getByRole("button", { name: "Logging in..." });
+
+    expect(submitButton).toBeInTheDocument();
+    expect(submitButton).toBeDisabled();
   });
 
   it("displays server error when error prop is provided", () => {
@@ -107,14 +109,23 @@ describe("LoginForm", () => {
   it("shows password validation error when password is too short", async () => {
     render(<LoginForm {...defaultProps} />);
 
+    fireEvent.input(screen.getByLabelText("Email"), {
+      target: { value: "test@example.com" },
+    });
+
     fireEvent.input(screen.getByLabelText("Password"), {
       target: { value: "short" },
     });
+
     fireEvent.submit(screen.getByRole("button", { name: "Log In" }));
 
     await waitFor(() => {
       expect(
-        screen.getByText(/password must be at least 6 characters/i)
+        screen.getByText((text) =>
+          text
+            .toLowerCase()
+            .includes("password must be at least 8 characters long")
+        )
       ).toBeInTheDocument();
     });
   });
